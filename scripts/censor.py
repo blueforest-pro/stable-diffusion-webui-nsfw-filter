@@ -54,6 +54,7 @@ def censor_batch(x, safety_checker_adj: float):
     x_checked_image, has_nsfw_concept = check_safety(x_samples_ddim_numpy, safety_checker_adj)
     x = torch.from_numpy(x_checked_image).permute(0, 3, 1, 2)
 
+    # 自定义图片
     index = 0
     for unsafe_value in has_nsfw_concept:
         try:
