@@ -52,6 +52,7 @@ class StableDiffusionSafetyChecker(BaseSafetyChecker, ABC):
         has_nsfw_concepts = [len(res["bad_concepts"]) > 0 for res in result]
 
         for idx, has_nsfw_concept in enumerate(has_nsfw_concepts):
+            # has_nsfw_concept = True  # debug
             if has_nsfw_concept:
                 images[idx] = np.zeros(images[idx].shape)  # black image
 

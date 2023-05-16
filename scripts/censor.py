@@ -54,22 +54,22 @@ def censor_batch(x, safety_checker_adj: float):
     x_checked_image, has_nsfw_concept = check_safety(x_samples_ddim_numpy, safety_checker_adj)
     x = torch.from_numpy(x_checked_image).permute(0, 3, 1, 2)
 
-    # 自定义图片
-    index = 0
-    for unsafe_value in has_nsfw_concept:
-        try:
-            if unsafe_value is True:
-                hwc = x.shape
-                y = Image.open(warning_image).convert("RGB").resize((hwc[3], hwc[2]))
-                y = (np.array(y) / 255.0).astype("float32")
-                y = torch.from_numpy(y)
-                y = torch.unsqueeze(y, 0).permute(0, 3, 1, 2)
-                assert y.shape == x.shape
-                x[index] = y
-            index += 1
-        except Exception as e:
-            logger.warning(e)
-            index += 1
+    # # 把审核不通过的图片换成自定义图片
+    # index = 0
+    # for unsafe_value in has_nsfw_concept:
+    #     try:
+    #         if unsafe_value is True:
+    #             hwc = x.shape
+    #             y = Image.open(warning_image).convert("RGB").resize((hwc[3], hwc[2]))
+    #             y = (np.array(y) / 255.0).astype("float32")
+    #             y = torch.from_numpy(y)
+    #             y = torch.unsqueeze(y, 0).permute(0, 3, 1, 2)
+    #             assert y.shape == x.shape
+    #             x[index] = y
+    #         index += 1
+    #     except Exception as e:
+    #         logger.warning(e)
+    #         index += 1
 
     return x
 
@@ -93,7 +93,7 @@ class NsfwCheckScript(scripts.Script):
             images
         """
         images = kwargs['images']
-        safety_checker_adj = -0.02
+        safety_checker_adj = -0.02   # 审核严格系数 [-0.5,0.5]
         images[:] = censor_batch(images,safety_checker_adj)[:]
 
         # images = kwargs['images']
